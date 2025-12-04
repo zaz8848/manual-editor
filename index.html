@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>操作手册编辑器 (高级版)</title>
+    <style>
+        body {
+            font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f0f2f5;
+        }
+
+        /* Header */
+        .app-header {
+            background: #0078d4;
+            color: white;
+            padding: 0 20px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .app-actions button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .app-actions button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary {
+            background: #fff !important;
+            color: #0078d4 !important;
+            font-weight: bold;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .step-item {
+            padding: 10px;
+            border: 1px solid #eee;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .step-item:hover {
+            background: #f0f0f0;
+        }
+
+        .step-item.active {
+            border-color: #0078d4;
+            background: #e6f2fa;
+        }
+
+        .step-item-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .sidebar-actions {
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .sidebar-actions button {
+            flex: 1 0 40%;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .sidebar-actions hr {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        /* Editor Area */
+        .editor-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .editor-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            flex-shrink: 0;
+        }
+
+        .field-group {
+            margin-bottom: 20px;
+        }
+
+        .field-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .input-title {
+            width: 100%;
+            padding: 10px;
+            font-size: 1.2rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Section Tabs */
+        .section-tabs {
+            display: flex;
+            align-items: center;
+            background: #f3f2f1;
+            padding: 5px;
+            border-radius: 4px 4px 0 0;
+            gap: 5px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .section-tab {
+            padding: 6px 12px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 3px;
+            font-size: 0.9rem;
+        }
+
+        .section-tab:hover {
+            background: #e1dfdd;
+        }
+
+        .section-tab.active {
+            background: white;
+            border-color: #ddd;
+            border-bottom-color: white;
+            font-weight: bold;
+            color: #0078d4;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-tab-add {
+            color: #0078d4;
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 2px 8px;
+        }
+
+        .section-tab-delete {
+            margin-left: auto;
+            color: #d13438;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border: 1px solid #d13438;
+            border-radius: 3px;
+            background: white;
+        }
+
+        .section-tab-delete:hover {
+            background: #fde7e9;
+        }
+
+        /* Rich Text Toolbar */
+        .toolbar {
+            border: 1px solid #ddd;
+            border-top: none;
+            border-bottom: none;
+            padding: 8px;
+            background: #f9f9f9;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar button {
+            padding: 4px 8px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 3px;
+        }
+
+        .toolbar button:hover {
+            background: #eee;
+        }
+
+        .editor-content {
+            border: 1px solid #ddd;
+            border-radius: 0 0 4px 4px;
+            padding: 20px;
+            min-height: 300px;
+            flex: 1 0 auto;
+            outline: none;
+            /* overflow-y: auto;  Removed to allow auto-height */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .editor-content img {
+            max-width: 100%;
+            height: auto;
+            /* Ensure aspect ratio */
+            border: 1px solid #eee;
+            display: block;
+            /* Prevent inline spacing issues */
+        }
+
+        .editor-content iframe {
+            max-width: 100%;
+        }
+
+        .code-input {
+            width: 100%;
+            min-height: 60px;
+            background: #f3f2f1;
+            color: #323130;
+            font-family: Consolas, "Courier New", monospace;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #e1dfdd;
+            resize: vertical;
+            overflow: hidden;
+            box-sizing: border-box;
+            line-height: 1.5;
+            display: block;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+
+        .code-input:focus {
+            outline: 2px solid #0078d4;
+            border-color: transparent;
+        }
+
+        /* Preview Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 95%;
+            height: 95%;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-frame {
+            flex: 1;
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Image Resizing Handles */
+        .resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #0078d4;
+            border: 1px solid white;
+            z-index: 1000;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .resize-handle-se {
+            cursor: se-resize;
+        }
+
+        .img-selected {
+            outline: 2px solid #0078d4;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-header">
+        <div class="app-title">操作手册编辑器 (高级版)</div>
+        <div class="app-actions">
+            <button onclick="previewGuide()">预览</button>
+            <button class="btn-primary" onclick="exportHTML()">保存并导出 HTML</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="step-list" id="stepList">
+                <!-- Steps will be injected here -->
+            </div>
+            <div class="sidebar-actions">
+                <button onclick="addStep()">+ 添加步骤</button>
+                <button onclick="deleteStep()" style="color: red;">删除</button>
+                <button onclick="deleteAllSteps()" style="color: darkred; margin-top: 5px;">🗑️ 清空全部</button>
+                <hr style="width:100%; border:0; border-top:1px solid #ddd; margin: 10px 0;">
+                <button onclick="saveProject()">💾 保存工程</button>
+                <button onclick="document.getElementById('loadProjectInput').click()">📂 读取工程</button>
+                <input type="file" id="loadProjectInput" style="display:none" onchange="loadProject(this)"
+                    accept=".json">
+                <button onclick="document.getElementById('appendProjectInput').click()">➕ 追加步骤</button>
+                <input type="file" id="appendProjectInput" style="display:none" onchange="appendProject(this)"
+                    accept=".json">
+            </div>
+        </div>
+
+        <div class="editor-area">
+            <div class="editor-card">
+                <div class="field-group">
+                    <label class="field-label">步骤标题</label>
+                    <input type="text" class="input-title" id="stepTitleInput" oninput="updateCurrentStep('title')">
+                </div>
+
+                <div class="field-group" style="flex: 1 0 auto; display: flex; flex-direction: column;">
+                    <label class="field-label">内容编辑 (幻灯片)</label>
+
+                    <!-- Section Tabs UI -->
+                    <div class="section-tabs" id="sectionTabs">
+                        <!-- Tabs injected by JS -->
+                    </div>
+
+                    <div class="toolbar">
+                        <button onclick="execCmd('bold')"><b>B</b></button>
+                        <button onclick="execCmd('italic')"><i>I</i></button>
+                        <button onclick="execCmd('underline')"><u>U</u></button>
+                        <button onclick="execCmd('insertOrderedList')">OL</button>
+                        <button onclick="execCmd('insertUnorderedList')">UL</button>
+                        <span style="border-left:1px solid #ccc; margin:0 5px;"></span>
+                        <button onclick="execCmd('justifyLeft')" title="左对齐">⬅️</button>
+                        <button onclick="execCmd('justifyCenter')" title="居中">⏺️</button>
+                        <button onclick="execCmd('justifyRight')" title="右对齐">➡️</button>
+                        <span style="border-left:1px solid #ccc; margin:0 5px;"></span>
+                        <button onclick="insertLink()">🔗 链接</button>
+                        <button onclick="insertImage()">🖼️ 图片</button>
+                        <button onclick="insertVideo()">🎥 视频</button>
+                        <button onclick="insertCode()">💻 代码</button>
+                        <span style="border-left:1px solid #ccc; margin:0 5px;"></span>
+                        <select onchange="changeLayout(this.value)" id="layoutSelect"
+                            style="padding:4px; border:1px solid #ccc; border-radius:3px;">
+                            <option value="full">单栏布局</option>
+                            <option value="split-50-50">双栏 50:50</option>
+                            <option value="split-30-70">双栏 30:70</option>
+                            <option value="split-70-30">双栏 70:30</option>
+                        </select>
+                        <button onclick="execCmd('removeFormat')" style="margin-left:auto">清除格式</button>
+                    </div>
+
+                    <div id="editorContainer" style="display:flex; gap:10px; flex:1 0 auto;">
+                        <div class="editor-wrapper" style="flex:1 0 auto; display:flex; flex-direction:column;">
+                            <div class="editor-content" id="stepContentInput" contenteditable="true"
+                                oninput="updateCurrentStep('content')"></div>
+                        </div>
+                        <div class="editor-wrapper" id="rightEditorWrapper"
+                            style="flex:1 0 auto; display:none; flex-direction:column;">
+                            <div class="editor-content" id="stepContentInputRight" contenteditable="true"
+                                oninput="updateCurrentStep('rightContent')"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>预览</h3>
+                <button onclick="closePreview()">关闭</button>
+            </div>
+            <iframe class="preview-frame" id="previewFrame"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Initial Data
+        let rawSteps = [
+        ];
+
+        // Convert raw steps to section-based steps
+        let steps = rawSteps.map(s => {
+            let sections = [];
+            if (s.sections) {
+                sections = s.sections.map(sec => {
+                    if (typeof sec === 'string') {
+                        return { content: sec, rightContent: '', layout: 'full' };
+                    }
+                    return sec;
+                });
+            } else {
+                sections = [{ content: s.content, rightContent: '', layout: 'full' }];
+            }
+
+            return {
+                title: s.title,
+                sections: sections
+            };
+        });
+
+        let currentStepIndex = 0;
+        let currentSectionIndex = 0;
+
+        function selectStep(index) {
+            currentStepIndex = index;
+            currentSectionIndex = 0;
+
+            // Update Active Class without re-rendering list
+            document.querySelectorAll('.step-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+
+            document.getElementById('stepTitleInput').value = steps[index].title;
+            renderSectionTabs();
+            renderSectionContent();
+        }
+
+        function renderStepList() {
+            const list = document.getElementById('stepList');
+            list.innerHTML = '';
+            steps.forEach((step, index) => {
+                const div = document.createElement('div');
+                div.className = `step-item ${index === currentStepIndex ? 'active' : ''}`;
+                div.innerHTML = `<div class="step-item-title">${index + 1}. ${step.title}</div>`;
+                div.onclick = () => selectStep(index);
+
+                // Drag and Drop Attributes
+                div.draggable = true;
+                div.ondragstart = (e) => dragStart(e, index, 'step');
+                div.ondragover = (e) => dragOver(e);
+                div.ondrop = (e) => drop(e, index, 'step');
+
+                list.appendChild(div);
+            });
+        }
+
+        function renderSectionTabs() {
+            const step = steps[currentStepIndex];
+            const container = document.getElementById('sectionTabs');
+            container.innerHTML = '';
+
+            // Render tabs for each section
+            step.sections.forEach((_, idx) => {
+                const tab = document.createElement('div');
+                tab.className = `section-tab ${idx === currentSectionIndex ? 'active' : ''}`;
+                tab.innerText = `页面 ${idx + 1}`;
+                tab.onclick = () => {
+                    currentSectionIndex = idx;
+                    renderSectionTabs();
+                    renderSectionContent();
+                };
+
+                // Drag and Drop Attributes
+                tab.draggable = true;
+                tab.ondragstart = (e) => dragStart(e, idx, 'section');
+                tab.ondragover = (e) => dragOver(e);
+                tab.ondrop = (e) => drop(e, idx, 'section');
+
+                container.appendChild(tab);
+            });
+
+            // Add Button
+            const addBtn = document.createElement('div');
+            addBtn.className = 'section-tab section-tab-add';
+            addBtn.innerText = '+';
+            addBtn.title = '添加新页面';
+            addBtn.onclick = addSection;
+            container.appendChild(addBtn);
+
+            // Delete Button (only if more than 1)
+            if (step.sections.length > 1) {
+                const delBtn = document.createElement('button');
+                delBtn.className = 'section-tab-delete';
+                delBtn.innerText = '删除当前页';
+                delBtn.onclick = deleteSection;
+                container.appendChild(delBtn);
+            }
+        }
+
+        // Drag and Drop Logic
+        let draggedItem = null;
+        let draggedType = null;
+
+        function dragStart(e, index, type) {
+            draggedItem = index;
+            draggedType = type;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', index);
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function drop(e, targetIndex, type) {
+            e.preventDefault();
+            if (draggedType !== type) return;
+            if (draggedItem === targetIndex) return;
+
+            if (type === 'step') {
+                // Reorder steps
+                const item = steps.splice(draggedItem, 1)[0];
+                steps.splice(targetIndex, 0, item);
+
+                // Update current index if needed
+                if (currentStepIndex === draggedItem) {
+                    currentStepIndex = targetIndex;
+                } else if (currentStepIndex > draggedItem && currentStepIndex <= targetIndex) {
+                    currentStepIndex--;
+                } else if (currentStepIndex < draggedItem && currentStepIndex >= targetIndex) {
+                    currentStepIndex++;
+                }
+
+                renderStepList();
+                selectStep(currentStepIndex); // Refresh view
+            } else if (type === 'section') {
+                // Reorder sections
+                const sections = steps[currentStepIndex].sections;
+                const item = sections.splice(draggedItem, 1)[0];
+                sections.splice(targetIndex, 0, item);
+
+                // Update current section index
+                if (currentSectionIndex === draggedItem) {
+                    currentSectionIndex = targetIndex;
+                } else if (currentSectionIndex > draggedItem && currentSectionIndex <= targetIndex) {
+                    currentSectionIndex--;
+                } else if (currentSectionIndex < draggedItem && currentSectionIndex >= targetIndex) {
+                    currentSectionIndex++;
+                }
+
+                renderSectionTabs();
+                renderSectionContent();
+            }
+        }
+
+        function renderSectionContent() {
+            const step = steps[currentStepIndex];
+            // Ensure at least one section exists
+            if (!step.sections || step.sections.length === 0) {
+                step.sections = [{ content: "<p>请输入内容...</p>", rightContent: "", layout: "full" }];
+            }
+
+            const section = step.sections[currentSectionIndex];
+
+            // Update Layout UI
+            const layoutSelect = document.getElementById('layoutSelect');
+            layoutSelect.value = section.layout || 'full';
+
+            const rightWrapper = document.getElementById('rightEditorWrapper');
+            const leftEditor = document.getElementById('stepContentInput');
+            const rightEditor = document.getElementById('stepContentInputRight');
+
+            // Update Content
+            leftEditor.innerHTML = section.content || '';
+            rightEditor.innerHTML = section.rightContent || '';
+
+            // Apply Layout
+            if (section.layout && section.layout.startsWith('split')) {
+                rightWrapper.style.display = 'flex';
+                // Set flex ratios
+                if (section.layout === 'split-50-50') {
+                    leftEditor.parentElement.style.flex = '1';
+                    rightWrapper.style.flex = '1';
+                } else if (section.layout === 'split-30-70') {
+                    leftEditor.parentElement.style.flex = '3';
+                    rightWrapper.style.flex = '7';
+                } else if (section.layout === 'split-70-30') {
+                    leftEditor.parentElement.style.flex = '7';
+                    rightWrapper.style.flex = '3';
+                }
+            } else {
+                rightWrapper.style.display = 'none';
+                leftEditor.parentElement.style.flex = '1';
+            }
+        }
+
+        function updateCurrentStep(field) {
+            if (field === 'title') {
+                steps[currentStepIndex].title = document.getElementById('stepTitleInput').value;
+                renderStepList();
+            } else if (field === 'content') {
+                steps[currentStepIndex].sections[currentSectionIndex].content = document.getElementById('stepContentInput').innerHTML;
+            } else if (field === 'rightContent') {
+                steps[currentStepIndex].sections[currentSectionIndex].rightContent = document.getElementById('stepContentInputRight').innerHTML;
+            }
+        }
+
+        function changeLayout(layout) {
+            steps[currentStepIndex].sections[currentSectionIndex].layout = layout;
+            renderSectionContent();
+        }
+
+        // Section Management
+        function addSection() {
+            steps[currentStepIndex].sections.push({ content: "<p>新页面内容...</p>", rightContent: "", layout: "full" });
+            currentSectionIndex = steps[currentStepIndex].sections.length - 1;
+            renderSectionTabs();
+            renderSectionContent();
+        }
+
+        function deleteSection() {
+            const step = steps[currentStepIndex];
+            if (step.sections.length <= 1) {
+                alert("至少保留一页内容！");
+                return;
+            }
+            if (confirm("确定删除当前页吗？")) {
+                step.sections.splice(currentSectionIndex, 1);
+                currentSectionIndex = Math.max(0, currentSectionIndex - 1);
+                renderSectionTabs();
+                renderSectionContent();
+            }
+        }
+
+        function addStep() {
+            steps.push({ title: "新步骤", sections: [{ content: "<p>请输入内容...</p>", rightContent: "", layout: "full" }] });
+            renderStepList();
+            selectStep(steps.length - 1);
+        }
+
+        function deleteStep() {
+            if (confirm('确定要删除此步骤吗？')) {
+                steps.splice(currentStepIndex, 1);
+                if (steps.length === 0) {
+                    addStep();
+                } else {
+                    renderStepList();
+                    currentStepIndex = Math.max(0, currentStepIndex - 1);
+                    selectStep(currentStepIndex);
+                }
+            }
+        }
+
+        function moveStep(delta) {
+            const newIndex = currentStepIndex + delta;
+            if (newIndex >= 0 && newIndex < steps.length) {
+                const temp = steps[currentStepIndex];
+                steps[currentStepIndex] = steps[newIndex];
+                steps[newIndex] = temp;
+                selectStep(newIndex);
+            }
+        }
+
+        function deleteAllSteps() {
+            if (confirm('确定要清空所有步骤吗？此操作无法撤销！')) {
+                steps = [];
+                addStep(); // Add one default step
+            }
+        }
+
+        function saveProject() {
+            const data = JSON.stringify(steps, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'guide_project_' + new Date().toISOString().slice(0, 10) + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function loadProject(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const loadedSteps = JSON.parse(e.target.result);
+                    if (Array.isArray(loadedSteps)) {
+                        steps = loadedSteps;
+                        currentStepIndex = 0;
+                        currentSectionIndex = 0;
+                        renderStepList();
+                        selectStep(0);
+                        alert('工程读取成功！');
+                    } else {
+                        alert('文件格式错误：必须是步骤数组');
+                    }
+                } catch (err) {
+                    alert('无法解析 JSON 文件: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            input.value = ''; // Reset input
+        }
+
+        function appendProject(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const newSteps = JSON.parse(e.target.result);
+                    if (Array.isArray(newSteps)) {
+                        steps = steps.concat(newSteps);
+                        renderStepList();
+                        alert('步骤追加成功！');
+                    } else {
+                        alert('文件格式错误：必须是步骤数组');
+                    }
+                } catch (err) {
+                    alert('无法解析 JSON 文件: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            input.value = ''; // Reset input
+        }
+
+        // Selection Tracking
+        let lastRange = null;
+
+        function saveSelection() {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                // Check if range is within our editors
+                const container = range.commonAncestorContainer;
+                const editor1 = document.getElementById('stepContentInput');
+                const editor2 = document.getElementById('stepContentInputRight');
+
+                // Helper to check if node is inside editor
+                const isInside = (node, parent) => {
+                    while (node) {
+                        if (node === parent) return true;
+                        node = node.parentNode;
+                    }
+                    return false;
+                };
+
+                if (isInside(container, editor1) || isInside(container, editor2)) {
+                    lastRange = range.cloneRange();
+                }
+            }
+        }
+
+        function restoreSelection() {
+            if (lastRange) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(lastRange);
+                return true;
+            }
+            return false;
+        }
+
+        function checkEditorFocus() {
+            const sel = window.getSelection();
+            let inEditor = false;
+            if (sel.rangeCount > 0) {
+                const container = sel.getRangeAt(0).commonAncestorContainer;
+                const editor1 = document.getElementById('stepContentInput');
+                const editor2 = document.getElementById('stepContentInputRight');
+
+                const isInside = (node, parent) => {
+                    while (node) {
+                        if (node === parent) return true;
+                        node = node.parentNode;
+                    }
+                    return false;
+                };
+
+                if (isInside(container, editor1) || isInside(container, editor2)) {
+                    inEditor = true;
+                }
+            }
+
+            if (!inEditor) {
+                if (!restoreSelection()) {
+                    // Default to appending to the end of the left editor
+                    const editor = document.getElementById('stepContentInput');
+                    editor.focus();
+                    const range = document.createRange();
+                    range.selectNodeContents(editor);
+                    range.collapse(false); // Collapse to end
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    saveSelection(); // Save this new position
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        // Toolbar Commands
+        function execCmd(command, value = null) {
+            if (!checkEditorFocus()) return;
+            document.execCommand(command, false, value);
+            saveSelection();
+        }
+
+        function insertLink() {
+            const url = prompt("请输入链接 URL:", "https://");
+            if (url) {
+                const selection = window.getSelection();
+                if (selection.toString()) {
+                    execCmd('createLink', url);
+                } else {
+                    const text = prompt("请输入链接文本:", "链接");
+                    if (text) {
+                        const html = `<a href="${url}">${text}</a>`;
+                        insertHTML(html);
+                    }
+                }
+            }
+        }
+
+        function insertImage() {
+            const url = prompt("请输入图片 URL:", "https://");
+            if (url) execCmd('insertImage', url);
+        }
+
+        function insertVideo() {
+            const url = prompt("请输入视频 URL (mp4) 或 Embed 代码:", "");
+            if (!url) return;
+
+            let html = '';
+            if (url.includes('<iframe') || url.includes('<video')) {
+                html = url;
+            } else {
+                html = `<video src="${url}" controls style="max-width:100%"></video>`;
+            }
+
+            insertHTML(html);
+        }
+
+        function insertCode() {
+            // Insert a textarea for code editing (better for newlines and raw HTML)
+            const html = `<textarea class="code-input" placeholder="// 在此处输入代码..." oninput="this.textContent=this.value; this.style.height='auto'; this.style.height=this.scrollHeight+'px'"></textarea><p><br></p>`;
+            insertHTML(html);
+            // Auto-focus the new textarea
+            setTimeout(() => {
+                const textareas = document.querySelectorAll('.code-input');
+                if (textareas.length) textareas[textareas.length - 1].focus();
+            }, 10);
+        }
+
+        function insertHTML(html) {
+            if (!checkEditorFocus()) return;
+
+            const selection = window.getSelection();
+            if (selection.rangeCount) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+
+                const div = document.createElement('div');
+                div.innerHTML = html;
+
+                const frag = document.createDocumentFragment();
+                let node, lastNode;
+                while ((node = div.firstChild)) {
+                    lastNode = frag.appendChild(node);
+                }
+                range.insertNode(frag);
+
+                // Move cursor after
+                if (lastNode) {
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+                saveSelection();
+            }
+        }        // Helper to convert textareas to pre/code blocks for export
+        function processContentForExport(content) {
+            if (!content) return '';
+            const div = document.createElement('div');
+            div.innerHTML = content;
+            div.querySelectorAll('textarea.code-input').forEach(ta => {
+                const pre = document.createElement('pre');
+                // Teams-like style: Light grey background, subtle border, dark text
+                pre.style.cssText = "background:#f3f2f1; color:#323130; padding:12px; border:1px solid #e1dfdd; border-radius:4px; overflow-x:auto; font-family:Consolas, 'Courier New', monospace; margin: 10px 0; font-size: 0.9rem; white-space: pre-wrap; word-wrap: break-word;";
+
+                const code = document.createElement('code');
+                code.textContent = ta.value || ta.textContent;
+                pre.appendChild(code);
+
+                ta.parentNode.replaceChild(pre, ta);
+            });
+            return div.innerHTML;
+        }        // Preview & Export
+        function generateWizardHTML() {
+            let html = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>操作手册</title>
+    <style>
+        body, html { height: 100%; margin: 0; padding: 0; font-family: "Segoe UI", "Microsoft YaHei", sans-serif; overflow: hidden; background: #f5f5f5; }
+        .container { width: 100%; height: 100%; background: white; display: flex; flex-direction: column; }
+        
+        /* Header with Segmented Progress */
+        .header { background: #0078d4; color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        .header-top { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; font-size: 1.2rem; }
+        
+        .step-progress-bar {
+            display: flex;
+            background: rgba(0,0,0,0.1);
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+        }
+        .step-progress-bar::-webkit-scrollbar { display: none; }
+        
+        .step-block {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: background 0.2s;
+            opacity: 0.7;
+        }
+        .step-block:hover { background: rgba(255,255,255,0.1); opacity: 1; }
+        .step-block.active {
+            background: white;
+            color: #0078d4;
+            font-weight: bold;
+            opacity: 1;
+        }
+        
+        /* Main Content */
+        .step-wrapper { flex: 1; position: relative; overflow: hidden; display: none; flex-direction: column; height: 100%; }
+        .step-wrapper.active { display: flex; }
+        
+        .step-title { padding: 20px; font-size: 1.5rem; color: #0078d4; border-bottom: 1px solid #eee; flex-shrink: 0; }
+        
+        /* Carousel for Sections */
+        .sections-viewport { flex: 1; position: relative; overflow: hidden; width: 100%; }
+        .sections-track { display: flex; height: 100%; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
+        .section-slide { 
+            flex: 0 0 100%; 
+            min-width: 100%; 
+            height: 100%; 
+            overflow-y: auto; 
+            padding: 40px 40px 80px 40px; /* Bottom padding for fixed pagination */
+            box-sizing: border-box; 
+        }
+        
+        /* Section Pagination (Fixed Bottom) */
+        .section-pagination {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 15px 10px;
+            gap: 8px;
+            background: rgba(249, 249, 249, 0.95);
+            border-top: 1px solid #eee;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+        }
+        .section-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #555;
+            transition: all 0.2s;
+        }
+        .section-dot:hover { background: #d0d0d0; }
+        .section-dot.active {
+            background: #0078d4;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .lightbox-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            cursor: grab;
+            transition: transform 0.1s;
+        }
+        .lightbox-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .lightbox-btn {
+            background: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lightbox-btn:hover { background: #eee; }
+        .zoom-slider { width: 100px; cursor: pointer; }
+        
+        /* Content Styles */
+        img { max-width: 100% !important; height: auto !important; border: 1px solid #ddd; border-radius: 4px; margin: 10px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: zoom-in; display: block; }
+        p { line-height: 1.6; margin-bottom: 1em; }
+        li { margin-bottom: 0.5em; }
+        a { color: #0078d4; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        code, pre { background: #f3f2f1; padding: 2px 5px; border-radius: 3px; font-family: Consolas, monospace; color: #323130; }
+        .code-wrapper { position: relative; margin: 1em 0; }
+        .code-wrapper pre { padding: 12px; margin: 0; overflow-x: auto; background: #f3f2f1; color: #323130; border: 1px solid #e1dfdd; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; }
+        .copy-btn {
+            position: absolute; top: 5px; right: 5px;
+            background: white; color: #0078d4;
+            border: 1px solid #e1dfdd; border-radius: 4px;
+            padding: 4px 8px; font-size: 12px; cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        .copy-btn:hover { background: #f3f2f1; border-color: #0078d4; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="header-top">
+            <h1 id="page-title">操作向导</h1>
+        </div>
+        <div class="step-progress-bar">`;
+
+            // Render Step Blocks
+            steps.forEach((step, i) => {
+                html += `<div class="step-block ${i === 0 ? 'active' : ''}" id="step-block-${i + 1}" onclick="changeStep(${i + 1})">${i + 1}. ${step.title}</div>`;
+            });
+
+            html += `</div>
+    </div>
+    
+    <!-- Steps Container -->
+    <div id="steps-container" style="flex:1; overflow:hidden; position:relative; display:flex; flex-direction:column;">`;
+
+            steps.forEach((step, i) => {
+                html += `
+        <div class="step-wrapper ${i === 0 ? 'active' : ''}" id="step-${i + 1}" data-step="${i + 1}">
+            <div class="step-title">步骤 ${i + 1}: ${step.title}</div>
+            <div class="sections-viewport">
+                <div class="sections-track" id="track-${i + 1}">`;
+
+                step.sections.forEach((section, sIndex) => {
+                    let contentHtml = '';
+                    const processedContent = processContentForExport(section.content);
+                    const processedRight = processContentForExport(section.rightContent);
+
+                    if (section.layout && section.layout.startsWith('split')) {
+                        let leftFlex = 1, rightFlex = 1;
+                        if (section.layout === 'split-30-70') { leftFlex = 3; rightFlex = 7; }
+                        else if (section.layout === 'split-70-30') { leftFlex = 7; rightFlex = 3; }
+
+                        contentHtml = `
+                        <div style="display:flex; gap:20px; height:100%;">
+                            <div style="flex: ${leftFlex}; overflow-y: auto; padding-right: 10px;">
+                                ${processedContent}
+                            </div>
+                            <div style="flex: ${rightFlex}; overflow-y: auto; padding-left: 10px; border-left: 1px solid #eee;">
+                                ${processedRight || ''}
+                            </div>
+                        </div>`;
+                    } else {
+                        contentHtml = processedContent;
+                    }
+                    html += `<div class="section-slide">${contentHtml}</div>`;
+                });
+
+                html += `
+                </div>
+            </div>
+            <!-- Section Pagination -->
+            <div class="section-pagination" id="pagination-${i + 1}">`;
+
+                step.sections.forEach((_, sIndex) => {
+                    html += `<div class="section-dot ${sIndex === 0 ? 'active' : ''}" onclick="moveSlide(${i + 1}, ${sIndex})">${sIndex + 1}</div>`;
+                });
+
+                html += `</div>
+        </div>`;
+            });
+
+            html += `
+    </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+    <div class="lightbox-content" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" onclick="event.stopPropagation()">
+    </div>
+    <div class="lightbox-controls" onclick="event.stopPropagation()">
+        <button class="lightbox-btn" onclick="adjustZoom(-0.2)">-</button>
+        <input type="range" class="zoom-slider" id="zoom-slider" min="0.5" max="3" step="0.1" value="1" oninput="setZoom(this.value)">
+        <button class="lightbox-btn" onclick="adjustZoom(0.2)">+</button>
+        <button class="lightbox-btn" onclick="resetZoom()" style="width:auto; padding:0 10px; border-radius:15px; font-size:0.8rem">重置</button>
+        <button class="lightbox-btn" onclick="closeLightbox()" style="background:#d13438; color:white">×</button>
+    </div>
+</div>
+
+<script>
+    let currentStep = 1;
+    const totalSteps = ${steps.length};
+    // Track current slide index for each step
+    const stepSlides = {}; 
+    ${steps.map((s, i) => `stepSlides[${i + 1}] = { current: 0, total: ${s.sections.length} };`).join('\n    ')}
+
+    // Lightbox State
+    let currentZoom = 1;
+
+    function updateUI() {
+        // Update Step Blocks
+        document.querySelectorAll('.step-block').forEach(el => el.classList.remove('active'));
+        const activeBlock = document.getElementById('step-block-' + currentStep);
+        if(activeBlock) {
+            activeBlock.classList.add('active');
+            activeBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        // Show Active Step Wrapper
+        document.querySelectorAll('.step-wrapper').forEach(el => el.classList.remove('active'));
+        document.getElementById('step-' + currentStep).classList.add('active');
+    }
+
+    function changeStep(stepNum) {
+        if (stepNum >= 1 && stepNum <= totalSteps) {
+            currentStep = stepNum;
+            updateUI();
+        }
+    }
+
+    function moveSlide(stepId, slideIndex) {
+        const state = stepSlides[stepId];
+        if (slideIndex >= 0 && slideIndex < state.total) {
+            state.current = slideIndex;
+            const track = document.getElementById('track-' + stepId);
+            // Use 100% per slide
+            track.style.transform = \`translateX(-\${slideIndex * 100}%)\`;
+            
+            // Update Pagination Dots
+            const pagination = document.getElementById('pagination-' + stepId);
+            Array.from(pagination.children).forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === slideIndex);
+            });
+        }
+    }
+
+    // Lightbox Logic
+    document.addEventListener('click', function(e) {
+        if (e.target.tagName === 'IMG' && !e.target.closest('.lightbox')) {
+            const src = e.target.src;
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            img.src = src;
+            lightbox.style.display = 'flex';
+            resetZoom();
+        }
+    });
+
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+    }
+
+    function setZoom(val) {
+        currentZoom = parseFloat(val);
+        const img = document.getElementById('lightbox-img');
+        img.style.transform = \`scale(\${currentZoom})\`;
+    }
+
+    function adjustZoom(delta) {
+        const slider = document.getElementById('zoom-slider');
+        let newVal = parseFloat(slider.value) + delta;
+        newVal = Math.max(parseFloat(slider.min), Math.min(parseFloat(slider.max), newVal));
+        slider.value = newVal;
+        setZoom(newVal);
+    }
+
+    function resetZoom() {
+        const slider = document.getElementById('zoom-slider');
+        slider.value = 1;
+        setZoom(1);
+    }
+
+    updateUI();
+
+    // Add Copy Buttons to Code Blocks
+    document.querySelectorAll('pre').forEach(pre => {
+        if (pre.parentNode.className !== 'code-wrapper') {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'code-wrapper';
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(pre);
+            
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.innerText = '复制';
+            btn.onclick = () => {
+                const code = pre.innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = btn.innerText;
+                    btn.innerText = '已复制!';
+                    setTimeout(() => btn.innerText = originalText, 2000);
+                });
+            };
+            wrapper.appendChild(btn);
+        }
+    });
+<\/script>
+</body></html>`;
+            return html;
+        }
+
+        function previewGuide() {
+            const html = generateWizardHTML();
+            const frame = document.getElementById('previewFrame');
+            frame.srcdoc = html;
+            document.getElementById('previewModal').classList.add('open');
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.remove('open');
+        }
+
+        function exportHTML() {
+            const html = generateWizardHTML();
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'guide_advanced.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Image Resizing Logic
+        let selectedImg = null;
+        let resizeHandle = null;
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight;
+
+        function initImageResizing() {
+            document.addEventListener('click', function (e) {
+                // If clicking on an image inside editor
+                if (e.target.tagName === 'IMG' && e.target.closest('.editor-content')) {
+                    selectImage(e.target);
+                    e.stopPropagation(); // Prevent deselecting immediately
+                } else if (selectedImg && e.target !== resizeHandle) {
+                    deselectImage();
+                }
+            });
+
+            document.addEventListener('mousemove', function (e) {
+                if (isResizing && selectedImg) {
+                    e.preventDefault();
+                    const dx = e.clientX - startX;
+
+                    // Resize width, height auto
+                    const newWidth = startWidth + dx;
+                    if (newWidth > 50) {
+                        selectedImg.style.width = newWidth + 'px';
+                        selectedImg.style.height = 'auto'; // Maintain aspect ratio
+                        updateHandlePosition();
+
+                        // Trigger input event to save state
+                        const editor = selectedImg.closest('.editor-content');
+                        if (editor) editor.dispatchEvent(new Event('input'));
+                    }
+                }
+            });
+
+            document.addEventListener('mouseup', function (e) {
+                if (isResizing) {
+                    isResizing = false;
+                    document.body.style.cursor = 'default';
+                }
+            });
+
+            // Update handle position on scroll
+            document.addEventListener('scroll', function () {
+                if (selectedImg) updateHandlePosition();
+            }, true); // Capture phase for scrolling divs
+
+            // Also update on input (content changes)
+            document.addEventListener('input', function () {
+                if (selectedImg) updateHandlePosition();
+            }, true);
+        }
+
+        function selectImage(img) {
+            if (selectedImg === img) return;
+            deselectImage();
+
+            selectedImg = img;
+            selectedImg.classList.add('img-selected');
+
+            // Create Handle
+            resizeHandle = document.createElement('div');
+            resizeHandle.className = 'resize-handle resize-handle-se';
+            document.body.appendChild(resizeHandle);
+
+            updateHandlePosition();
+
+            resizeHandle.addEventListener('mousedown', function (e) {
+                isResizing = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = selectedImg.offsetWidth;
+                startHeight = selectedImg.offsetHeight;
+                document.body.style.cursor = 'se-resize';
+                e.stopPropagation();
+                e.preventDefault();
+            });
+        }
+
+        function deselectImage() {
+            if (selectedImg) {
+                selectedImg.classList.remove('img-selected');
+                selectedImg = null;
+            }
+            if (resizeHandle) {
+                resizeHandle.remove();
+                resizeHandle = null;
+            }
+        }
+
+        function updateHandlePosition() {
+            if (!selectedImg || !resizeHandle) return;
+            const rect = selectedImg.getBoundingClientRect();
+            resizeHandle.style.left = (rect.right - 6) + 'px'; // Center on corner
+            resizeHandle.style.top = (rect.bottom - 6) + 'px';
+        }
+
+        initImageResizing();
+
+        // Init
+        renderStepList();
+        selectStep(0);
+
+        // Initialize Selection Tracking
+        ['stepContentInput', 'stepContentInputRight'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('mouseup', saveSelection);
+                el.addEventListener('keyup', saveSelection);
+                el.addEventListener('input', saveSelection);
+                el.addEventListener('focus', saveSelection);
+            }
+        });
+
+    </script>
+</body>
+
+</html>
