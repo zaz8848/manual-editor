@@ -354,6 +354,261 @@
         .img-selected {
             outline: 2px solid #0078d4;
         }
+
+        /* Media Manager Modal */
+        .media-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .media-modal.open {
+            display: flex;
+        }
+
+        .media-modal-content {
+            background: white;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80%;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .media-modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9f9f9;
+        }
+
+        .media-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .media-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #eee;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            gap: 15px;
+        }
+
+        .media-item:hover {
+            background: #f5f5f5;
+        }
+
+        .media-preview {
+            width: 100px;
+            height: 60px;
+            object-fit: contain;
+            background: #f0f0f0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .media-preview img,
+        .media-preview video {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .media-preview.error {
+            background: #fde7e9;
+            color: #d13438;
+            font-size: 0.75rem;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .media-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .media-type {
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .media-src {
+            font-size: 0.8rem;
+            color: #333;
+            word-break: break-all;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .media-delete-btn {
+            background: #d13438;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .media-delete-btn:hover {
+            background: #a4262c;
+        }
+
+        .no-media {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+        }
+
+        /* Video insert modal */
+        .video-insert-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1002;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-insert-modal.open {
+            display: flex;
+        }
+
+        .video-insert-content {
+            background: white;
+            width: 500px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .video-insert-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9f9f9;
+        }
+
+        .video-insert-body {
+            padding: 20px;
+        }
+
+        .video-option {
+            margin-bottom: 20px;
+        }
+
+        .video-option label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .video-option input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .video-option-divider {
+            text-align: center;
+            color: #999;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .video-option-divider::before,
+        .video-option-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .video-option-divider::before {
+            left: 0;
+        }
+
+        .video-option-divider::after {
+            right: 0;
+        }
+
+        .video-file-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #0078d4;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .video-file-btn:hover {
+            background: #106ebe;
+        }
+
+        .video-insert-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .video-insert-footer button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background: #f3f2f1;
+            border: 1px solid #ddd;
+        }
+
+        .btn-insert {
+            background: #0078d4;
+            color: white;
+            border: none;
+        }
+
+        .btn-insert:hover {
+            background: #106ebe;
+        }
+
+        .video-file-name {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #666;
+        }
     </style>
 </head>
 
@@ -415,8 +670,9 @@
                         <span style="border-left:1px solid #ccc; margin:0 5px;"></span>
                         <button onclick="insertLink()">🔗 链接</button>
                         <button onclick="insertImage()">🖼️ 图片</button>
-                        <button onclick="insertVideo()">🎥 视频</button>
+                        <button onclick="openVideoInsertModal()">🎥 视频</button>
                         <button onclick="insertCode()">💻 代码</button>
+                        <button onclick="openMediaManager()" title="管理图片和视频">📋 媒体管理</button>
                         <span style="border-left:1px solid #ccc; margin:0 5px;"></span>
                         <select onchange="changeLayout(this.value)" id="layoutSelect"
                             style="padding:4px; border:1px solid #ccc; border-radius:3px;">
@@ -440,6 +696,50 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Media Manager Modal -->
+    <div class="media-modal" id="mediaManagerModal">
+        <div class="media-modal-content">
+            <div class="media-modal-header">
+                <h3>媒体管理器</h3>
+                <button onclick="closeMediaManager()">关闭</button>
+            </div>
+            <div class="media-modal-body" id="mediaList">
+                <!-- Media items will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Insert Modal -->
+    <div class="video-insert-modal" id="videoInsertModal">
+        <div class="video-insert-content">
+            <div class="video-insert-header">
+                <h3>插入视频</h3>
+                <button onclick="closeVideoInsertModal()"
+                    style="background:none;border:none;font-size:1.2rem;cursor:pointer">×</button>
+            </div>
+            <div class="video-insert-body">
+                <div class="video-option">
+                    <label>方式一：输入视频链接或嵌入代码</label>
+                    <input type="text" id="videoUrlInput" placeholder="输入视频 URL (mp4) 或 Embed 代码">
+                </div>
+                <div class="video-option-divider">或</div>
+                <div class="video-option">
+                    <label>方式二：上传本地视频</label>
+                    <label class="video-file-btn">
+                        📁 选择视频文件
+                        <input type="file" id="videoFileInput" accept="video/*" style="display:none"
+                            onchange="handleVideoFileSelect(this)">
+                    </label>
+                    <div class="video-file-name" id="videoFileName"></div>
+                </div>
+            </div>
+            <div class="video-insert-footer">
+                <button class="btn-cancel" onclick="closeVideoInsertModal()">取消</button>
+                <button class="btn-insert" onclick="confirmVideoInsert()">插入</button>
             </div>
         </div>
     </div>
@@ -897,18 +1197,209 @@
             if (url) execCmd('insertImage', url);
         }
 
+        // Video Insert Modal
+        let pendingVideoFile = null;
+
+        function openVideoInsertModal() {
+            document.getElementById('videoInsertModal').classList.add('open');
+            document.getElementById('videoUrlInput').value = '';
+            document.getElementById('videoFileInput').value = '';
+            document.getElementById('videoFileName').textContent = '';
+            pendingVideoFile = null;
+        }
+
+        function closeVideoInsertModal() {
+            document.getElementById('videoInsertModal').classList.remove('open');
+            pendingVideoFile = null;
+        }
+
+        function handleVideoFileSelect(input) {
+            if (input.files && input.files[0]) {
+                pendingVideoFile = input.files[0];
+                document.getElementById('videoFileName').textContent = '已选择: ' + pendingVideoFile.name;
+            }
+        }
+
+        function confirmVideoInsert() {
+            const urlInput = document.getElementById('videoUrlInput').value.trim();
+
+            if (pendingVideoFile) {
+                // 本地视频文件 - 转换为 base64
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const base64 = e.target.result;
+                    const html = `<video src="${base64}" controls style="max-width:100%" data-filename="${pendingVideoFile.name}"></video>`;
+                    closeVideoInsertModal();
+                    insertHTML(html);
+                };
+                reader.onerror = function () {
+                    alert('读取视频文件失败！');
+                };
+                reader.readAsDataURL(pendingVideoFile);
+            } else if (urlInput) {
+                // URL 或 embed 代码
+                let html = '';
+                if (urlInput.includes('<iframe') || urlInput.includes('<video')) {
+                    html = urlInput;
+                } else {
+                    html = `<video src="${urlInput}" controls style="max-width:100%"></video>`;
+                }
+                closeVideoInsertModal();
+                insertHTML(html);
+            } else {
+                alert('请输入视频链接或选择本地视频文件！');
+            }
+        }
+
+        // 保留旧函数以兼容
         function insertVideo() {
-            const url = prompt("请输入视频 URL (mp4) 或 Embed 代码:", "");
-            if (!url) return;
+            openVideoInsertModal();
+        }
+
+        // Media Manager
+        function openMediaManager() {
+            const modal = document.getElementById('mediaManagerModal');
+            modal.classList.add('open');
+            renderMediaList();
+        }
+
+        function closeMediaManager() {
+            document.getElementById('mediaManagerModal').classList.remove('open');
+        }
+
+        function renderMediaList() {
+            const mediaList = document.getElementById('mediaList');
+            const step = steps[currentStepIndex];
+            const section = step.sections[currentSectionIndex];
+
+            // 获取当前内容中的所有图片和视频
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = (section.content || '') + (section.rightContent || '');
+
+            const images = tempDiv.querySelectorAll('img');
+            const videos = tempDiv.querySelectorAll('video');
+            const iframes = tempDiv.querySelectorAll('iframe');
 
             let html = '';
-            if (url.includes('<iframe') || url.includes('<video')) {
-                html = url;
-            } else {
-                html = `<video src="${url}" controls style="max-width:100%"></video>`;
+            let mediaIndex = 0;
+
+            // 处理图片
+            images.forEach((img, idx) => {
+                const src = img.getAttribute('src') || '';
+                const isBase64 = src.startsWith('data:');
+                html += createMediaItemHTML('image', src, mediaIndex++, isBase64);
+            });
+
+            // 处理视频
+            videos.forEach((video, idx) => {
+                const src = video.getAttribute('src') || '';
+                const isBase64 = src.startsWith('data:');
+                const filename = video.getAttribute('data-filename') || '';
+                html += createMediaItemHTML('video', src, mediaIndex++, isBase64, filename);
+            });
+
+            // 处理 iframe（嵌入视频）
+            iframes.forEach((iframe, idx) => {
+                const src = iframe.getAttribute('src') || '';
+                html += createMediaItemHTML('iframe', src, mediaIndex++, false);
+            });
+
+            if (html === '') {
+                html = '<div class="no-media">当前页面没有图片或视频</div>';
             }
 
-            insertHTML(html);
+            mediaList.innerHTML = html;
+
+            // 检查图片加载状态
+            setTimeout(checkMediaLoadStatus, 100);
+        }
+
+        function createMediaItemHTML(type, src, index, isBase64, filename = '') {
+            const typeLabels = {
+                'image': '🖼️ 图片',
+                'video': '🎥 视频',
+                'iframe': '📺 嵌入视频'
+            };
+
+            let previewHTML = '';
+            let displaySrc = src;
+
+            if (isBase64) {
+                displaySrc = filename ? `本地文件: ${filename}` : '本地文件 (Base64)';
+            } else if (src.length > 100) {
+                displaySrc = src.substring(0, 100) + '...';
+            }
+
+            if (type === 'image') {
+                previewHTML = `<img src="${src}" onerror="this.parentElement.classList.add('error'); this.parentElement.innerHTML='加载失败'">`;
+            } else if (type === 'video') {
+                if (isBase64) {
+                    previewHTML = '<span style="font-size:2rem">🎥</span>';
+                } else {
+                    previewHTML = `<video src="${src}" onerror="this.parentElement.classList.add('error'); this.parentElement.innerHTML='加载失败'"></video>`;
+                }
+            } else {
+                previewHTML = '<span style="font-size:2rem">📺</span>';
+            }
+
+            return `
+                <div class="media-item" data-type="${type}" data-src="${src.replace(/"/g, '&quot;')}">
+                    <div class="media-preview" id="media-preview-${index}">
+                        ${previewHTML}
+                    </div>
+                    <div class="media-info">
+                        <div class="media-type">${typeLabels[type]}</div>
+                        <div class="media-src" title="${src.replace(/"/g, '&quot;')}">${displaySrc}</div>
+                    </div>
+                    <button class="media-delete-btn" onclick="deleteMediaItem(this)">删除</button>
+                </div>
+            `;
+        }
+
+        function checkMediaLoadStatus() {
+            // 额外检查确保失效的媒体显示错误状态
+            document.querySelectorAll('.media-preview img').forEach(img => {
+                if (img.complete && img.naturalHeight === 0) {
+                    img.parentElement.classList.add('error');
+                    img.parentElement.innerHTML = '加载失败';
+                }
+            });
+        }
+
+        function deleteMediaItem(btn) {
+            const mediaItem = btn.closest('.media-item');
+            const type = mediaItem.getAttribute('data-type');
+            const src = mediaItem.getAttribute('data-src');
+
+            if (!confirm('确定要删除此媒体吗？')) return;
+
+            // 从编辑器内容中删除
+            const leftEditor = document.getElementById('stepContentInput');
+            const rightEditor = document.getElementById('stepContentInputRight');
+
+            [leftEditor, rightEditor].forEach(editor => {
+                let elements;
+                if (type === 'image') {
+                    elements = editor.querySelectorAll('img');
+                } else if (type === 'video') {
+                    elements = editor.querySelectorAll('video');
+                } else if (type === 'iframe') {
+                    elements = editor.querySelectorAll('iframe');
+                }
+
+                elements.forEach(el => {
+                    if (el.getAttribute('src') === src) {
+                        el.remove();
+                    }
+                });
+            });
+
+            // 更新数据
+            updateCurrentStep('content');
+            updateCurrentStep('rightContent');
+
+            // 刷新媒体列表
+            renderMediaList();
         }
 
         function insertCode() {
