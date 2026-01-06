@@ -609,6 +609,49 @@
             font-size: 0.85rem;
             color: #666;
         }
+
+        /* Media Wrapper with Delete Button */
+        .media-wrapper {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            margin: 5px 0;
+        }
+
+        .media-wrapper img,
+        .media-wrapper video {
+            display: block;
+            max-width: 100%;
+        }
+
+        .media-delete-overlay {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 24px;
+            height: 24px;
+            background: rgba(209, 52, 56, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .media-wrapper:hover .media-delete-overlay {
+            display: flex;
+        }
+
+        .media-delete-overlay:hover {
+            background: rgba(164, 38, 44, 1);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 
@@ -669,10 +712,9 @@
                         <button onclick="execCmd('justifyRight')" title="右对齐">➡️</button>
                         <span style="border-left:1px solid #ccc; margin:0 5px;"></span>
                         <button onclick="insertLink()">🔗 链接</button>
-                        <button onclick="insertImage()">🖼️ 图片</button>
+                        <button onclick="openImageInsertModal()">🖼️ 图片</button>
                         <button onclick="openVideoInsertModal()">🎥 视频</button>
                         <button onclick="insertCode()">💻 代码</button>
-                        <button onclick="openMediaManager()" title="管理图片和视频">📋 媒体管理</button>
                         <span style="border-left:1px solid #ccc; margin:0 5px;"></span>
                         <select onchange="changeLayout(this.value)" id="layoutSelect"
                             style="padding:4px; border:1px solid #ccc; border-radius:3px;">
@@ -713,18 +755,49 @@
         </div>
     </div>
 
-    <!-- Video Insert Modal -->
-    <div class="video-insert-modal" id="videoInsertModal">
-        <div class="video-insert-content">
-            <div class="video-insert-header">
-                <h3>插入视频</h3>
-                <button onclick="closeVideoInsertModal()"
-                    style="background:none;border:none;font-size:1.2rem;cursor:pointer">×</button>
+    <!-- Image Insert Modal -->
+    <div class="media-modal" id="imageInsertModal">
+        <div class="media-modal-content" style="max-width:500px;">
+            <div class="media-modal-header">
+                <h3>插入图片</h3>
+                <button onclick="closeImageInsertModal()">关闭</button>
             </div>
-            <div class="video-insert-body">
+            <div class="media-modal-body">
+                <div class="video-option">
+                    <label>方式一：输入图片链接</label>
+                    <input type="text" id="imageUrlInput" placeholder="输入图片 URL（支持 gif、png、jpg 等）"
+                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;">
+                </div>
+                <div class="video-option-divider">或</div>
+                <div class="video-option">
+                    <label>方式二：上传本地图片</label>
+                    <label class="video-file-btn">
+                        📁 选择图片文件
+                        <input type="file" id="imageFileInput" accept="image/*,.gif,.png,.jpg,.jpeg,.webp,.bmp,.svg"
+                            style="display:none" onchange="handleImageFileSelect(this)">
+                    </label>
+                    <div class="video-file-name" id="imageFileName"></div>
+                </div>
+                <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px;">
+                    <button class="btn-cancel" onclick="closeImageInsertModal()">取消</button>
+                    <button class="btn-insert" onclick="confirmImageInsert()">插入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Insert Modal -->
+    <div class="media-modal" id="videoInsertModal">
+        <div class="media-modal-content" style="max-width:500px;">
+            <div class="media-modal-header">
+                <h3>插入视频</h3>
+                <button onclick="closeVideoInsertModal()">关闭</button>
+            </div>
+            <div class="media-modal-body">
                 <div class="video-option">
                     <label>方式一：输入视频链接或嵌入代码</label>
-                    <input type="text" id="videoUrlInput" placeholder="输入视频 URL (mp4) 或 Embed 代码">
+                    <input type="text" id="videoUrlInput" placeholder="输入视频 URL (mp4) 或 iframe 嵌入代码"
+                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;">
                 </div>
                 <div class="video-option-divider">或</div>
                 <div class="video-option">
@@ -736,10 +809,10 @@
                     </label>
                     <div class="video-file-name" id="videoFileName"></div>
                 </div>
-            </div>
-            <div class="video-insert-footer">
-                <button class="btn-cancel" onclick="closeVideoInsertModal()">取消</button>
-                <button class="btn-insert" onclick="confirmVideoInsert()">插入</button>
+                <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px;">
+                    <button class="btn-cancel" onclick="closeVideoInsertModal()">取消</button>
+                    <button class="btn-insert" onclick="confirmVideoInsert()">插入</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1192,18 +1265,57 @@
             }
         }
 
-        function insertImage() {
-            const url = prompt("请输入图片 URL:", "https://");
-            if (url) execCmd('insertImage', url);
+        // ==================== 图片插入模态框 ====================
+        let pendingImageFile = null;
+
+        function openImageInsertModal() {
+            document.getElementById('imageInsertModal').classList.add('open');
+            document.getElementById('imageUrlInput').value = '';
+            document.getElementById('imageFileName').textContent = '';
+            pendingImageFile = null;
         }
 
-        // Video Insert Modal
+        function closeImageInsertModal() {
+            document.getElementById('imageInsertModal').classList.remove('open');
+            pendingImageFile = null;
+        }
+
+        function handleImageFileSelect(input) {
+            if (input.files && input.files[0]) {
+                pendingImageFile = input.files[0];
+                document.getElementById('imageFileName').textContent = '已选择: ' + pendingImageFile.name;
+            }
+        }
+
+        function confirmImageInsert() {
+            const urlInput = document.getElementById('imageUrlInput').value.trim();
+
+            if (pendingImageFile) {
+                // 本地图片文件 - 转换为 base64
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    insertMediaWithWrapper('img', e.target.result, pendingImageFile.name);
+                    closeImageInsertModal();
+                };
+                reader.onerror = function () {
+                    alert('读取图片文件失败！');
+                };
+                reader.readAsDataURL(pendingImageFile);
+            } else if (urlInput) {
+                // URL
+                insertMediaWithWrapper('img', urlInput);
+                closeImageInsertModal();
+            } else {
+                alert('请输入图片链接或选择本地图片文件！');
+            }
+        }
+
+        // ==================== 视频插入模态框 ====================
         let pendingVideoFile = null;
 
         function openVideoInsertModal() {
             document.getElementById('videoInsertModal').classList.add('open');
             document.getElementById('videoUrlInput').value = '';
-            document.getElementById('videoFileInput').value = '';
             document.getElementById('videoFileName').textContent = '';
             pendingVideoFile = null;
         }
@@ -1227,10 +1339,8 @@
                 // 本地视频文件 - 转换为 base64
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    const base64 = e.target.result;
-                    const html = `<video src="${base64}" controls style="max-width:100%" data-filename="${pendingVideoFile.name}"></video>`;
+                    insertMediaWithWrapper('video', e.target.result, pendingVideoFile.name);
                     closeVideoInsertModal();
-                    insertHTML(html);
                 };
                 reader.onerror = function () {
                     alert('读取视频文件失败！');
@@ -1238,25 +1348,55 @@
                 reader.readAsDataURL(pendingVideoFile);
             } else if (urlInput) {
                 // URL 或 embed 代码
-                let html = '';
                 if (urlInput.includes('<iframe') || urlInput.includes('<video')) {
-                    html = urlInput;
+                    insertHTML(urlInput);
                 } else {
-                    html = `<video src="${urlInput}" controls style="max-width:100%"></video>`;
+                    insertMediaWithWrapper('video', urlInput);
                 }
                 closeVideoInsertModal();
-                insertHTML(html);
             } else {
                 alert('请输入视频链接或选择本地视频文件！');
             }
         }
 
-        // 保留旧函数以兼容
+        // 兼容旧的 insertImage 函数
+        function insertImage() {
+            openImageInsertModal();
+        }
+
+        // 兼容旧的 insertVideo 函数
         function insertVideo() {
             openVideoInsertModal();
         }
 
-        // Media Manager
+        // ==================== 媒体包装器功能 ====================
+        function insertMediaWithWrapper(type, src, filename = '') {
+            let mediaTag = '';
+            if (type === 'img') {
+                mediaTag = `<img src="${src}" style="max-width:100%" ${filename ? `data-filename="${filename}"` : ''}>`;
+            } else if (type === 'video') {
+                mediaTag = `<video src="${src}" controls style="max-width:100%" ${filename ? `data-filename="${filename}"` : ''}></video>`;
+            }
+
+            const html = `<div class="media-wrapper" contenteditable="false">
+                <button class="media-delete-overlay" onclick="deleteMediaWrapper(this)" title="删除">×</button>
+                ${mediaTag}
+            </div><p><br></p>`;
+
+            insertHTML(html);
+        }
+
+        function deleteMediaWrapper(btn) {
+            const wrapper = btn.closest('.media-wrapper');
+            if (wrapper) {
+                wrapper.remove();
+                // 更新数据
+                updateCurrentStep('content');
+                updateCurrentStep('rightContent');
+            }
+        }
+
+        // ==================== Media Manager（保留但简化） ====================
         function openMediaManager() {
             const modal = document.getElementById('mediaManagerModal');
             modal.classList.add('open');
@@ -1440,11 +1580,30 @@
                 }
                 saveSelection();
             }
-        }        // Helper to convert textareas to pre/code blocks for export
+        }
+
+        // Helper to convert textareas to pre/code blocks for export
+        // Also removes media wrappers and delete buttons
         function processContentForExport(content) {
             if (!content) return '';
             const div = document.createElement('div');
             div.innerHTML = content;
+
+            // 移除媒体包装器，只保留媒体元素
+            div.querySelectorAll('.media-wrapper').forEach(wrapper => {
+                // 移除删除按钮
+                const deleteBtn = wrapper.querySelector('.media-delete-overlay');
+                if (deleteBtn) deleteBtn.remove();
+
+                // 获取媒体元素（img 或 video）
+                const media = wrapper.querySelector('img, video');
+                if (media) {
+                    // 用媒体元素替换包装器
+                    wrapper.parentNode.replaceChild(media, wrapper);
+                }
+            });
+
+            // 处理代码块
             div.querySelectorAll('textarea.code-input').forEach(ta => {
                 const pre = document.createElement('pre');
                 // Teams-like style: Light grey background, subtle border, dark text
@@ -1456,6 +1615,7 @@
 
                 ta.parentNode.replaceChild(pre, ta);
             });
+
             return div.innerHTML;
         }        // Preview & Export
         function generateWizardHTML() {
